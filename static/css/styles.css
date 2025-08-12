@@ -23,8 +23,8 @@ html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:1
 }
 .table thead th {
 	font-weight: bold;
-	text-align: left;
-	border: none;
+	text-align: center;
+    border: 1px solid #dddddd;
 	padding: 10px 15px;
 	background: #EDEDED;
 	font-size: 14px;
@@ -43,8 +43,8 @@ html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:1
 	border-radius: 0 20px 0 0;
 }
 .table tbody td {
-	text-align: left;
-	border: none;
+	text-align: center;
+	border: 1px solid #dddddd;
 	padding: 10px 15px;
 	font-size: 14px;
 	vertical-align: top;
