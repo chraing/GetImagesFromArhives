@@ -11,16 +11,15 @@
 <div class="flash {{cat}}">{{msg}}</div>
 {%endfor%}
 
-<form action="" method="post" class="form-contact">
-<p>Архив:&nbsp;<select required="required" size="1" name="arhiv"><option value="archive.admoblkaluga.ru" {% if selected_arhiv == "archive.admoblkaluga.ru" %} selected {% endif %}>Калуга (ГАКО)</option><option value="gato.tularegion.ru" {% if selected_arhiv == "gato.tularegion.ru" %} selected {% endif %}>Тула(ГАТО)</option></select></p>
-
-<p>Логин:&nbsp;<input maxlength="100" name="login" size="15" type="text" />&nbsp; Пароль:&nbsp;<input name="password" size="15" type="password" /></p>
-
-<div id="1" style="background:#eeeeee; border:1px solid #cccccc; padding:5px 10px">
-<p>Oid/url:&nbsp;<input maxlength="100" name="iod" size="20" type="text" />&nbsp;изображение:&nbsp;&nbsp;<input name="page_start" size="5" type="text" />&nbsp;-&nbsp;<input name="page_stop" size="5" type="text" />&nbsp;&nbsp;<input name="AddOid" type="submit" value="Добавить Oid" />&nbsp;<input name="LoadOid" type="button" value="Загрузить Oid'ы из файла..." />&nbsp;<input name="start" type="button" value="Начать скачивание" />&nbsp;</p>
+<form action="" method="post" class="form-contact" enctype="multipart/form-data">
+<div class="div">
+	<p>Архив:&nbsp;<select required="required" size="1" name="arhiv"><option value="archive.admoblkaluga.ru" {% if selected_arhiv == "archive.admoblkaluga.ru" %} selected {% endif %}>Калуга (ГАКО)</option><option value="gato.tularegion.ru" {% if selected_arhiv == "gato.tularegion.ru" %} selected {% endif %}>Тула(ГАТО)</option></select>
+	Логин:&nbsp;<input maxlength="100" name="login" size="15" type="text" />&nbsp; Пароль:&nbsp;<input name="password" size="15" type="password" /></p>
+</div>
+<div class="div">
+	<p>Oid/url:&nbsp;<input maxlength="100" name="iod" size="20" type="text" />&nbsp;изображение:&nbsp;&nbsp;<input name="page_start" size="5" type="text" />&nbsp;-&nbsp;<input name="page_stop" size="5" type="text" />&nbsp;или&nbsp;<input name="file" type="file" />&nbsp;<input name="AddOid" type="submit" value="Добавить/Загрузить"/>&nbsp;<input name="start" type="button" value="Начать скачивание" />&nbsp;</p>
 </div>
 </form>
-<br>
 <table  class="table">
 	<thead>
 		<tr>
