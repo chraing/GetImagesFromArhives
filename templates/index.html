@@ -4,6 +4,7 @@
 	<title>Загрузка изображений из архивов</title>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">  
 	<link type="text/css" href="{{url_for('static',filename='css/styles.css')}}" rel="stylesheet">
+<script src="{{url_for('static',filename='scripts/jquery-3.6.0.min.js')}}"></script>
 </head>
 <body style="font-size: 14px; position: relative; padding: 15px 20px;">
 
@@ -13,11 +14,11 @@
 
 <form action="" method="post" class="form-contact" enctype="multipart/form-data">
 <div class="div">
-	<p>Архив:&nbsp;<select required="required" size="1" name="arhiv"><option value="archive.admoblkaluga.ru" {% if selected_arhiv == "archive.admoblkaluga.ru" %} selected {% endif %}>Калуга (ГАКО)</option><option value="gato.tularegion.ru" {% if selected_arhiv == "gato.tularegion.ru" %} selected {% endif %}>Тула(ГАТО)</option></select>
+	<p>Архив:&nbsp;<select required="required" size="1" name="arhiv"><option value="cgamos.ru" {% if selected_arhiv == "cgamos.ru" %} selected {% endif %}>Москва (cgamos.ru)</option><option value="archive.admoblkaluga.ru" {% if selected_arhiv == "archive.admoblkaluga.ru" %} selected {% endif %}>Калуга (ГАКО)</option><option value="gato.tularegion.ru" {% if selected_arhiv == "gato.tularegion.ru" %} selected {% endif %}>Тула (ГАТО)</option></select>
 	Логин:&nbsp;<input maxlength="100" name="login" size="15" type="text" />&nbsp; Пароль:&nbsp;<input name="password" size="15" type="password" /></p>
 </div>
 <div class="div">
-	<p>Oid/url:&nbsp;<input maxlength="100" name="iod" size="20" type="text" />&nbsp;изображение:&nbsp;&nbsp;<input name="page_start" size="5" type="text" />&nbsp;-&nbsp;<input name="page_stop" size="5" type="text" />&nbsp;или&nbsp;<input name="file" type="file" />&nbsp;<input name="AddOid" type="submit" value="Добавить/Загрузить"/>&nbsp;<input name="start" type="button" value="Начать скачивание" />&nbsp;</p>
+	<p>Oid/url:&nbsp;<input maxlength="100" name="iod" size="20" type="text" />&nbsp;изображение:&nbsp;&nbsp;<input name="page_start" size="5" type="text" />&nbsp;-&nbsp;<input name="page_stop" size="5" type="text" />&nbsp;или&nbsp;<input name="file" type="file" />&nbsp;<input name="AddOid" type="submit" value="Добавить/Загрузить"/>&nbsp;<input name="start" type="submit" value="Начать скачивание" />&nbsp;</p>
 </div>
 </form>
 <table  class="table">
@@ -30,15 +31,15 @@
 			<th>Статус</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody id="data-table-body">
 	{% if trs %}
 	{% for tr in  trs %}
 		<tr>
-			<td>{{tr[0]}}</td>
-			<td>{{tr[1]}}</td>
-			<td>{{tr[2]}}</td>
-			<td>{{tr[3]}}</td>
-			<td>{{tr[4]}}</td>
+			<td>{{tr.iod}}</td>
+			<td>{{tr.page_start}}</td>
+			<td>{{tr.page_stop}}</td>
+			<td class="count_rec">{{tr.count_rec}}</td>
+			<td class="status">{{tr.status}}</td>
 		</tr>	
 	{% endfor %}
 	{% else%}
@@ -51,5 +52,21 @@
 		</tr>{% endif%}
 	</tbody>
 </table>
+<script>
+        $(document).ready(function() {
+            function updateData() {
+                $.getJSON('/update_data', function(data) {
+                    // Обновляем значения в таблице
+                    $('#data-table-body tr').each(function(index) {
+                        $(this).find('.status').text(data[index].status);
+						$(this).find('.count_rec').text(data[index].count_rec);
+                    });
+                });
+            }
+
+            // Обновляем данные каждые 5 секунд (5000 миллисекунд)
+            setInterval(updateData, 5000);
+        });
+    </script>
 </body>
 </html>
