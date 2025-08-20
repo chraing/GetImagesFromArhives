@@ -60,6 +60,14 @@
                     $('#data-table-body tr').each(function(index) {
                         $(this).find('.status').text(data[index].status);
 						$(this).find('.count_rec').text(data[index].count_rec);
+						if (data[index].complete) {
+							$(this).find('.iod').css('background-color',  '#77dd77');
+							$(this).find('.page_start').css('background-color',  '#77dd77');
+							$(this).find('.page_stop').css('background-color',  '#77dd77');
+							$(this).find('.count_rec').css('background-color',  '#77dd77');
+		
+							$(this).find('.status').css('background-color',  '#77dd77');
+					}
                     });
                 });
             }
