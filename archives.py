@@ -7,27 +7,67 @@ from pathlib import Path
 import sys
 import json
 import time
+import threading
+import  settings
 
 
-if getattr(sys, 'frozen', False):
-    script_path = Path(sys.executable).parent
-elif __file__:
-    script_path = Path(__file__).parent
+def _init(katalog):
+    lock = threading.Lock()
+    katalog=katalog.rstrip()
+    if katalog[-1:]=='/':
+        katalog=katalog[:-1]
+    if getattr(sys, 'frozen', False):
+        script_path = Path(sys.executable).parent
+    elif __file__:
+        script_path = Path(__file__).parent
+    dir_new=script_path.joinpath('uploaded_images',os.path.basename(katalog))
+    #print ('dir_new',dir_new)
+    if not os.path.isdir(dir_new):    
+        print ('Создаю каталог',dir_new)
+        os.mkdir(dir_new) 
+    return lock,katalog,dir_new
+
+def _save_images(urls,lock,number_trs,sess,dir_new,start,stop,pref_url,sleep_mls):
+    rr_len=len(urls)
+    with lock:  
+        settings.trs[number_trs]['count_rec']=rr_len
+    print (f'Найдено {rr_len} изображений: ')
+    if  start=='':
+        start=1
+    if  stop=='':
+        stop=rr_len
+    if int(start)<=rr_len:
+        settings.trs[number_trs]['status']='0'
+        for i in range(int(start)-1,int(stop)):
+            data = sess.get(pref_url+urls[i])
+            time.sleep(sleep_mls) 
+            with open(dir_new.joinpath(str(i+1).zfill(4) +".jpg"), "wb") as out:
+                out.write(data.content)
+            with lock:    
+                settings.trs[number_trs]['status']=int(settings.trs[number_trs]['status'])+1
+    
 
 
-print ('Получение изображений со следующих сайтов:\n1. https://cgamos.ru\n2. https://yandex.ru/archive')
-katalog = input("Введите URL: ")
-katalog=katalog.rstrip()
-if katalog[-1:]=='/':
-    katalog=katalog[:-1]
-print (f'Каталог сохранения изображений {script_path.joinpath(os.path.basename(katalog))}')
+def GetFromCgamos(katalog,start,stop,number_trs):   
+    lock,katalog,dir_new=_init(katalog)
+    url_documenta=f'{katalog}/'
+    headers ={'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.28 Safari/537.36', 'Referer':f'{katalog}/'}   
+    s = requests.Session()
+    s.headers = headers 
+    response = s.get(url_documenta)
+    bs = BeautifulSoup(response.text,"lxml")
+    temp = bs.find_all('li', class_='swiper-slide')
+    urls_image_opisey=[]
+    for li in temp:
+        urls_image_opisey.append (li.find('img')['data-src'])  
+    _save_images(urls_image_opisey,lock,number_trs,s,dir_new,start,stop,'https://cgamos.ru',0)
+    s.close()
+    return number_trs
 
-if not os.path.isdir(script_path.joinpath(os.path.basename(katalog))):
-    dir_new=script_path.joinpath(os.path.basename(katalog))
-    os.mkdir(dir_new)
-    print (f'Создал каталог {dir_new}')
 
-def GetFromYandexArhive(katalog):
+def GetFromYandexArhive(katalog,start,stop,number_trs):
+    lock,katalog,dir_new=_init(katalog)
+    
     headers ={
             'Host': 'yandex.ru',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0',
@@ -97,65 +137,6 @@ def GetFromYandexArhive(katalog):
                 else:
                     urls_image_opisey.append ('')
         
-    rr_len=len(urls_image_opisey)
-    if rr_len>0:
-        print (f'Найдено изображений: {rr_len}')
-        for i,img in enumerate(urls_image_opisey):
-            print (f'{i+1}. {img}')
-        start_stop=input("Введите номер (или диапазон) для скачивания изображения (например 10-20 или 11): ")
-        if '-' in start_stop:
-            start_stop=start_stop.split("-")
-        else:
-            start_stop=[start_stop,start_stop]
-
-        cnt_dwnload=0
-        for i in range(int(start_stop[0])-1,int(start_stop[1])):
-            tpm = s.get(f'{katalog}/{i}')
-            time.sleep(10)
-            if len(urls_image_opisey[i])>1:
-                data = s.get(urls_image_opisey[i]) 
-                with open(script_path.joinpath(os.path.basename(katalog),str(i+1).zfill(4) +".jpg"), "wb") as out:
-                    out.write(data.content)
-                cnt_dwnload+=1
-            #time.sleep(5)
-        print (f'Скачено {cnt_dwnload} изображений.')
+    _save_images(urls_image_opisey,lock,number_trs,s,dir_new,start,stop,'',10)
     s.close()
-
-
-def GetFromCgamos(katalog):
-    url_documenta=f'{katalog}/'
-    headers ={'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.28 Safari/537.36', 'Referer':f'{katalog}/'}   
-    s = requests.Session()
-    s.headers = headers 
-    response = s.get(url_documenta)
-    bs = BeautifulSoup(response.text,"lxml")
-    temp = bs.find_all('li', class_='swiper-slide')
-    urls_image_opisey=[]
-    for li in temp:
-        urls_image_opisey.append (li.find('img')['data-src'])  
-    rr_len=len(temp)
-    print (f'Найдено {rr_len} изображений: ')
-    #for i,img in enumerate(urls_image_opisey):
-    #    print (f'{i+1}. https://cgamos.ru/{img}')
-    #Убрано потомучто по прямым сылка не показывает и не качает
-    start_stop=input("Введите номер (или диапазон) для скачивания изображения (например 10-20 или 11): ")
-    if '-' in start_stop:
-        start_stop=start_stop.split("-")
-    else:
-        start_stop=[start_stop,start_stop]
-
-    cnt_dwnload=0
-    if int(start_stop[1])<=rr_len:
-        for i in range(int(start_stop[0])-1,int(start_stop[1])):
-            data = s.get('https://cgamos.ru'+urls_image_opisey[i]) 
-            with open(script_path.joinpath(os.path.basename(katalog),str(i+1).zfill(4) +".jpg"), "wb") as out:
-                out.write(data.content)
-            cnt_dwnload+=1
-    print (f'Скачено {cnt_dwnload} изображений.')
-    s.close()
-
-if 'cgamos.ru' in katalog:
-    GetFromCgamos(katalog)
-elif '/archive/catalog' in katalog:
-    GetFromYandexArhive(katalog)
-
+    return number_trs
