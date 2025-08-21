@@ -21,7 +21,6 @@ def index():
         log_pas=[config.get(selected_arhiv, 'login'),config.get(selected_arhiv, 'password')]
     else:
         log_pas=None
-        
     return render_template('index.html',trs=settings.trs,selected_arhiv=selected_arhiv,log_pas=log_pas)
 
 @app.route('/update_date',methods=["POST","GET"])
