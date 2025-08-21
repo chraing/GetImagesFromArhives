@@ -40,13 +40,50 @@ def _save_images(urls,lock,number_trs,sess,dir_new,start,stop,pref_url,sleep_mls
     if int(start)<=rr_len:
         settings.trs[number_trs]['status']='0'
         for i in range(int(start)-1,int(stop)):
-            data = sess.get(pref_url+urls[i])
+            data = sess.get(pref_url+urls[i],cookies)
+            while len(data.text)<50000:
+                data = sess.get(pref_url+urls[i],cookies)
+
             time.sleep(sleep_mls) 
             with open(dir_new.joinpath(str(i+1).zfill(4) +".jpg"), "wb") as out:
                 out.write(data.content)
             with lock:    
                 settings.trs[number_trs]['status']=int(settings.trs[number_trs]['status'])+1
     
+
+def GetFromTula(katalog,start,stop,number_trs,login,password):    
+    lock,katalog,dir_new=_init(katalog)  
+    s = requests.Session()
+    # Ниже данные для авторизации
+    payload = {
+        'username': login,
+        'password': password
+        }
+    url_documenta='https://gato.tularegion.ru/case/'+katalog #Контретный документ который грузим (посмотреть )
+    headers = {'Content-Type': 'application/json','User-Agent':	'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0'}
+    response = s.get('https://gato.tularegion.ru/login')
+    response = s.post('https://gato.tularegion.ru/auth',headers=headers, json=payload)
+    bearer=response.json()['token']
+    response = s.get(url_documenta) 
+    bs = BeautifulSoup(response.text,"lxml")
+    temp = bs.find('a', 'btn case-tile-button btn-secondary read')
+    if temp is None:
+        return number_trs,"Проверьте, активна ли подписка на сайте архива"
+    else:
+        ssilka=temp['href']
+        response = s.get('https://gato.tularegion.ru/lksrv'+ssilka,cookies={'auth.strategy':'local','auth._token.local':bearer})
+        print ('https://gato.tularegion.ru/lksrv'+ssilka)
+        soup = BeautifulSoup(response.text, "html.parser")
+        scriptt = soup.find("script")
+        r0=re.search(r'checkRequiredPayment\(img, (\w{30})',str(scriptt),flags=re.MULTILINE| re.DOTALL).group(1); #тут нужный ключ
+        print(katalog,'Нашел ключ с изображениями')
+        rr=re.search('var '+r0+' = \[(.*?)\]', str(scriptt),flags=re.MULTILINE| re.DOTALL).group(1)
+        rr=rr.replace("'","")
+        rr=rr.split(", ")
+        _save_images(rr,lock,number_trs,s,dir_new,start,stop,'https://gato.tularegion.ru/lksrv/private/imageViewer/image?url=',0,{'auth.strategy':'local','auth._token.local':bearer})
+    s.close()
+    return number_trs,None
+
 
 def GetFromKaluga(katalog,start,stop,number_trs,login,password):
     lock,katalog,dir_new=_init(katalog)            
@@ -73,7 +110,7 @@ def GetFromKaluga(katalog,start,stop,number_trs,login,password):
         rr=re.search('var '+r0+' = \[(.*?)\]', str(scriptt),flags=re.MULTILINE| re.DOTALL).group(1)
         rr=rr.replace("'","")
         rr=rr.split(", ")
-        _save_images(rr,lock,number_trs,s,dir_new,start,stop,'https://archive.admoblkaluga.ru/private/imageViewer/image?url=',0)
+        _save_images(rr,lock,number_trs,s,dir_new,start,stop,'https://archive.admoblkaluga.ru/private/imageViewer/image?url=',0,None)
     s.close()
     return number_trs,None
     
@@ -90,14 +127,13 @@ def GetFromCgamos(katalog,start,stop,number_trs,login,password):
     urls_image_opisey=[]
     for li in temp:
         urls_image_opisey.append (li.find('img')['data-src'])  
-    _save_images(urls_image_opisey,lock,number_trs,s,dir_new,start,stop,'https://cgamos.ru',0)
+    _save_images(urls_image_opisey,lock,number_trs,s,dir_new,start,stop,'https://cgamos.ru',0,None)
     s.close()
     return number_trs,None
 
 
 def GetFromYandexArhive(katalog,start,stop,number_trs,login,password):
     lock,katalog,dir_new=_init(katalog)
-    
     headers ={
             'Host': 'yandex.ru',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0',
@@ -167,6 +203,6 @@ def GetFromYandexArhive(katalog,start,stop,number_trs,login,password):
                 else:
                     urls_image_opisey.append ('')
         
-    _save_images(urls_image_opisey,lock,number_trs,s,dir_new,start,stop,'',10)
+    _save_images(urls_image_opisey,lock,number_trs,s,dir_new,start,stop,'',10,None)
     s.close()
     return number_trs,None

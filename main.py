@@ -1,5 +1,5 @@
 from flask import Flask, render_template,flash, request,jsonify,redirect,url_for
-from  archives import GetFromCgamos,GetFromYandexArhive,GetFromKaluga
+from  archives import GetFromCgamos,GetFromYandexArhive,GetFromKaluga,GetFromTula
 #from threading import Thread
 import concurrent.futures as pool
 import settings
@@ -87,6 +87,8 @@ def update_date():
                                 f=GetFromYandexArhive
                             elif request.form.get('arhiv')=='archive.admoblkaluga.ru':
                                 f=GetFromKaluga
+                            elif request.form.get('arhiv')=='gato.tularegion.ru':
+                                f=GetFromTula   
                             future=executor.submit(f, trs_rec['iod'],start_image,stop_image,n,login,password)
                             futures.append(future)
                         # Ожидание результата и получение его
