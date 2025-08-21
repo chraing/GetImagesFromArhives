@@ -5,9 +5,6 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">  
 	<link type="text/css" href="{{url_for('static',filename='css/styles.css')}}" rel="stylesheet">
     <script src="{{url_for('static',filename='scripts/jquery-3.6.0.min.js')}}"></script>
-
-    <script src="{{url_for('static',filename='scripts/jquery-3.6.0.min.js')}}"></script>
-
 </head>
 <body style="font-size: 14px; position: relative; padding: 15px 20px;">
 
@@ -15,7 +12,6 @@
 <div class="flash {{cat}}">{{msg}}</div>
 {%endfor%}
 
-<form action="{{url_for('update_date')}}" method="post" class="form-contact" enctype="multipart/form-data">
 <form action="{{url_for('update_date')}}" method="post" class="form-contact" enctype="multipart/form-data">
 <div class="div">
 	<p>Архив:&nbsp;<select required="required" size="1" name="arhiv" onchange="form.submit()">
@@ -27,7 +23,6 @@
 &nbsp;<input name="SavePassword" type="submit" value="Сохранить"/></p>
 </div>
 <div class="div">
-	<p>Oid/url:&nbsp;<input maxlength="100" name="iod" size="20" type="text" />&nbsp;изображение:&nbsp;&nbsp;<input name="page_start" size="5" type="text" />&nbsp;-&nbsp;<input name="page_stop" size="5" type="text" />&nbsp;<input name="AddOid" type="submit" value="Добавить"/>&nbsp;или загрузить&nbsp;<input name="file" type="file" onchange="form.submit()"/><input name="start" type="submit" value="Начать скачивание" />&nbsp;</p>
 	<p>Oid/url:&nbsp;<input maxlength="100" name="iod" size="20" type="text" />&nbsp;изображение:&nbsp;&nbsp;<input name="page_start" size="5" type="text" />&nbsp;-&nbsp;<input name="page_stop" size="5" type="text" />&nbsp;<input name="AddOid" type="submit" value="Добавить"/>&nbsp;или загрузить&nbsp;<input name="file" type="file" onchange="form.submit()"/><input name="start" type="submit" value="Начать скачивание" />&nbsp;</p>
 </div>
 </form>
@@ -50,14 +45,8 @@
 			<td class="page_stop" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.page_stop}}</td>
 			<td class="count_rec"{%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.count_rec}}</td>
 			<td class="status" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.status}}</td>
-			<td class="iod" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.iod}}</td>
-			<td class="page_start" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.page_start}}</td>
-			<td class="page_stop" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.page_stop}}</td>
-			<td class="count_rec"{%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.count_rec}}</td>
-			<td class="status" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.status}}</td>
 		</tr>	
 	{% endfor %}
-	{% else %}
 	{% else %}
 	<tr>
 			<td>&nbsp;</td>
@@ -65,17 +54,15 @@
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
-		</tr>{% endif %}
-		</tr>{% endif %}
+	</tr>{% endif %}
+
 	</tbody>
 </table>
 <script>
         $(document).ready(function() {
             function updateData() {
                 $.getJSON('/update_data_table', function(data) {
-                $.getJSON('/update_data_table', function(data) {
                     // Обновляем значения в таблице
-					$('#data-table-body tr').each(function(index) {
 					$('#data-table-body tr').each(function(index) {
                         $(this).find('.status').text(data[index].status);
 						$(this).find('.count_rec').text(data[index].count_rec);
@@ -85,16 +72,10 @@
 						$(this).find('.page_stop').css('background-color',  '#AEFFC5');
 						$(this).find('.count_rec').css('background-color',  '#AEFFC5');
 						$(this).find('.status').css('background-color',  '#AEFFC5');
-						$(this).find('.iod').css('background-color',  '#AEFFC5');
-						$(this).find('.page_start').css('background-color',  '#AEFFC5');
-						$(this).find('.page_stop').css('background-color',  '#AEFFC5');
-						$(this).find('.count_rec').css('background-color',  '#AEFFC5');
-						$(this).find('.status').css('background-color',  '#AEFFC5');
-					}
+						}
                     });
                 });
             }
-
             // Обновляем данные каждые 5 секунд (5000 миллисекунд)
             setInterval(updateData, 5000);
         });
