@@ -9,6 +9,7 @@ import json
 import time
 import threading
 import  settings
+import re
 
 
 def _init(katalog):
@@ -47,8 +48,37 @@ def _save_images(urls,lock,number_trs,sess,dir_new,start,stop,pref_url,sleep_mls
                 settings.trs[number_trs]['status']=int(settings.trs[number_trs]['status'])+1
     
 
+def GetFromKaluga(katalog,start,stop,number_trs,login,password):
+    lock,katalog,dir_new=_init(katalog)            
+    s = requests.Session()
+    payload = {
+        'backURL': 'https://archive.admoblkaluga.ru/login',
+        'username': login,
+        'password': password
+        }
+    url_documenta='https://archive.admoblkaluga.ru/private/office/documents?oid='+katalog #Контретный документ который грузим (посмотреть )
+    response = s.post('https://archive.admoblkaluga.ru/login', data=payload)
+    response = s.get(url_documenta) 
+    bs = BeautifulSoup(response.text,"lxml")
+    temp = bs.find('a', 'btn btn-primary btn-kaisa-action')
+    if temp is None:
+        return number_trs,"Проверьте, активность подписки и логин/пароль"
+    else:
+        ssilka=temp['href']
+        response = s.get('https://archive.admoblkaluga.ru'+ssilka)
+        soup = BeautifulSoup(response.text, "html.parser")
+        scriptt = soup.find("script")
+        r0=re.search(r'checkRequiredPayment\(img, (\w{30})',str(scriptt),flags=re.MULTILINE| re.DOTALL).group(1); #тут нужный ключ
+        print(katalog,'Нашел ключ с изображениями')
+        rr=re.search('var '+r0+' = \[(.*?)\]', str(scriptt),flags=re.MULTILINE| re.DOTALL).group(1)
+        rr=rr.replace("'","")
+        rr=rr.split(", ")
+        _save_images(rr,lock,number_trs,s,dir_new,start,stop,'https://archive.admoblkaluga.ru/private/imageViewer/image?url=',0)
+    s.close()
+    return number_trs,None
+    
 
-def GetFromCgamos(katalog,start,stop,number_trs):   
+def GetFromCgamos(katalog,start,stop,number_trs,login,password):   
     lock,katalog,dir_new=_init(katalog)
     url_documenta=f'{katalog}/'
     headers ={'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.28 Safari/537.36', 'Referer':f'{katalog}/'}   
@@ -62,10 +92,10 @@ def GetFromCgamos(katalog,start,stop,number_trs):
         urls_image_opisey.append (li.find('img')['data-src'])  
     _save_images(urls_image_opisey,lock,number_trs,s,dir_new,start,stop,'https://cgamos.ru',0)
     s.close()
-    return number_trs
+    return number_trs,None
 
 
-def GetFromYandexArhive(katalog,start,stop,number_trs):
+def GetFromYandexArhive(katalog,start,stop,number_trs,login,password):
     lock,katalog,dir_new=_init(katalog)
     
     headers ={
@@ -139,4 +169,4 @@ def GetFromYandexArhive(katalog,start,stop,number_trs):
         
     _save_images(urls_image_opisey,lock,number_trs,s,dir_new,start,stop,'',10)
     s.close()
-    return number_trs
+    return number_trs,None

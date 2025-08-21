@@ -46,7 +46,7 @@
 			<td class="page_stop" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.page_stop}}</td>
 			<td class="count_rec"{%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.count_rec}}</td>
 			<td class="status" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.status}}</td>
-			<td class="action" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}><a href={{url_for('update_date')}}?delete_record={{ loop.index -1}}>Удалить</a></td>
+			<td class="action" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}><a href="{{url_for('update_date')}}?delete_record={{loop.index-1}}" class="delete_record">Удалить</a></td>
 		</tr>	
 	{% endfor %}
 	{% else %}

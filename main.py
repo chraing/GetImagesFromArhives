@@ -1,5 +1,5 @@
 from flask import Flask, render_template,flash, request,jsonify,redirect,url_for
-from  archives import GetFromCgamos,GetFromYandexArhive
+from  archives import GetFromCgamos,GetFromYandexArhive,GetFromKaluga
 #from threading import Thread
 import concurrent.futures as pool
 import settings
@@ -78,17 +78,24 @@ def update_date():
                         start_image=trs_rec['page_start']
                         stop_image=trs_rec['page_stop']
                         complete=trs_rec['complete']
+                        login=request.form.get('login','')
+                        password=request.form.get('password','')
                         if complete==False:
                             if request.form.get('arhiv')=='cgamos.ru':
                                 f=GetFromCgamos
                             elif request.form.get('arhiv')=='yandex.ru':
                                 f=GetFromYandexArhive
-                            future=executor.submit(f, trs_rec['iod'],start_image,stop_image,n)
+                            elif request.form.get('arhiv')=='archive.admoblkaluga.ru':
+                                f=GetFromKaluga
+                            future=executor.submit(f, trs_rec['iod'],start_image,stop_image,n,login,password)
                             futures.append(future)
                         # Ожидание результата и получение его
                     for future in pool.as_completed(futures):
-                        rez= future.result()
-                        settings.trs[rez]['complete']=True
+                        rez,error= future.result()
+                        if error:
+                            settings.trs[rez]['status']=error
+                        else:
+                            settings.trs[rez]['complete']=True
                     flash('Закачка изображений завершена',category='success')
         elif request.form.get('SavePassword'):
             login=request.form.get('login','')
