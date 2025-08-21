@@ -25,6 +25,10 @@ def index():
 
 @app.route('/update_date',methods=["POST","GET"])
 def update_date():
+    if request.method=='GET':
+        delete_rec_num=request.args.get('delete_record')
+        if delete_rec_num.isdigit():
+            settings.trs.pop(int(delete_rec_num))
     if request.method=='POST':
         iod=request.form.get('iod')
         page_start=request.form.get('page_start','') if request.form.get('page_start','').isdigit() else ""

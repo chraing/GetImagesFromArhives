@@ -29,11 +29,12 @@
 <table  class="table">
 	<thead>
 		<tr>
-			<th>Oid</th>
+			<th>Oid/url</th>
 			<th>С</th>
 			<th>По</th>
 			<th>Всего</th>
 			<th>Статус</th>
+			<th>Действие</th>
 		</tr>
 	</thead>
 	<tbody id="data-table-body">
@@ -45,10 +46,12 @@
 			<td class="page_stop" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.page_stop}}</td>
 			<td class="count_rec"{%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.count_rec}}</td>
 			<td class="status" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}>{{tr.status}}</td>
+			<td class="action" {%if tr.complete %}style="background-color: #AEFFC5;"{% endif %}><a href={{url_for('update_date')}}?delete_record={{ loop.index -1}}>Удалить</a></td>
 		</tr>	
 	{% endfor %}
 	{% else %}
 	<tr>
+			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
@@ -72,6 +75,7 @@
 						$(this).find('.page_stop').css('background-color',  '#AEFFC5');
 						$(this).find('.count_rec').css('background-color',  '#AEFFC5');
 						$(this).find('.status').css('background-color',  '#AEFFC5');
+						$(this).find('.action').css('background-color',  '#AEFFC5');
 						}
                     });
                 });
