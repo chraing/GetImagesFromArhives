@@ -28,7 +28,7 @@ def _init(katalog):
         os.mkdir(dir_new) 
     return lock,katalog,dir_new
 
-def _save_images(urls,lock,number_trs,sess,dir_new,start,stop,pref_url,sleep_mls):
+def _save_images(urls,lock,number_trs,sess,dir_new,start,stop,pref_url,sleep_mls,cookies):
     rr_len=len(urls)
     with lock:  
         settings.trs[number_trs]['count_rec']=rr_len
@@ -40,9 +40,9 @@ def _save_images(urls,lock,number_trs,sess,dir_new,start,stop,pref_url,sleep_mls
     if int(start)<=rr_len:
         settings.trs[number_trs]['status']='0'
         for i in range(int(start)-1,int(stop)):
-            data = sess.get(pref_url+urls[i],cookies)
+            data = sess.get(pref_url+urls[i],cookies=cookies)
             while len(data.text)<50000:
-                data = sess.get(pref_url+urls[i],cookies)
+                data = sess.get(pref_url+urls[i],cookies=cookies)
 
             time.sleep(sleep_mls) 
             with open(dir_new.joinpath(str(i+1).zfill(4) +".jpg"), "wb") as out:
@@ -50,6 +50,37 @@ def _save_images(urls,lock,number_trs,sess,dir_new,start,stop,pref_url,sleep_mls
             with lock:    
                 settings.trs[number_trs]['status']=int(settings.trs[number_trs]['status'])+1
     
+
+def GetFromVladimir(katalog,start,stop,number_trs,login,password):        
+    lock,katalog,dir_new=_init(katalog) 
+    s = requests.Session()
+    payload = {
+        'backURL': 'https://vladimir.kaisa.ru/',
+        'username': login,
+        'password': password
+        }
+    url_documenta='https://vladimir.kaisa.ru/private/office/documents?oid='+katalog #Контретный документ который грузим (посмотреть )
+    response = s.post('https://vladimir.kaisa.ru/login', data=payload)
+    response = s.get(url_documenta) 
+    bs = BeautifulSoup(response.text,"lxml")
+    temp = bs.find_all('a', 'btn btn-primary btn-kaisa-action')
+    temp=temp[4]
+    if temp is None:
+        return number_trs,"Проверьте, активна ли подписка на сайте архива"
+    else:
+        ssilka=temp['href']
+        response = s.get('https://vladimir.kaisa.ru'+ssilka)
+        soup = BeautifulSoup(response.text, "html.parser")
+        scriptt = soup.find_all("script")
+        r0=re.search(r'checkRequiredPayment\(img, (\w{30})',str(scriptt),flags=re.MULTILINE| re.DOTALL).group(1); #тут нужный ключ
+        print('Нашел ключ с изображениями')
+        rr=re.search('var '+r0+' = \[(.*?)\]', str(scriptt),flags=re.MULTILINE| re.DOTALL).group(1)
+        rr=rr.replace("'","")
+        rr=rr.split(", ")
+        _save_images(rr,lock,number_trs,s,dir_new,start,stop,'https://vladimir.kaisa.ru/private/imageViewer/image?url=',0,None)
+    s.close()
+    return number_trs,None
+
 
 def GetFromTula(katalog,start,stop,number_trs,login,password):    
     lock,katalog,dir_new=_init(katalog)  
