@@ -19,18 +19,20 @@
 		<option value="cgamos.ru"{% if selected_arhiv == "cgamos.ru" %} selected {% endif %}>Москва (cgamos.ru)</option>
 		<option value="archive.admoblkaluga.ru"{% if selected_arhiv == "archive.admoblkaluga.ru" %} selected {% endif %}>Калуга (ГАКО)</option>
 		<option value="gato.tularegion.ru"{% if selected_arhiv == "gato.tularegion.ru" %} selected {% endif %}>Тула (ГАТО)</option>
-		<option value="vladimir.kaisa.ru"{% if selected_arhiv == "vladimir.kaisa.ru" %} selected {% endif %}>Владимир (ГАТО)</option></select>
+		<option value="vladimir.kaisa.ru"{% if selected_arhiv == "vladimir.kaisa.ru" %} selected {% endif %}>Владимир (ГАТО)</option>
+		<option value="geno-dbase.ru"{% if selected_arhiv == "geno-dbase.ru" %} selected {% endif %}>geno-dbase.ru</option>
+	</select>
 	Логин:&nbsp;<input maxlength="100" name="login" size="15" type="text" {% if log_pas %} value = "{{log_pas[0]}}"{% endif %} />&nbsp; Пароль:&nbsp;<input name="password" size="15" type="password" {% if log_pas %} value = "{{log_pas[1]}}"{% endif %}  />
 &nbsp;<input name="SavePassword" type="submit" value="Сохранить"/></p>
 </div>
 <div class="div">
-	<p>Oid/url:&nbsp;<input maxlength="100" name="iod" size="20" type="text" />&nbsp;изображение:&nbsp;&nbsp;<input name="page_start" size="5" type="text" />&nbsp;-&nbsp;<input name="page_stop" size="5" type="text" />&nbsp;<input name="AddOid" type="submit" value="Добавить"/>&nbsp;или загрузить&nbsp;<input name="file" type="file" onchange="form.submit()"/><input name="start" type="submit" value="Начать скачивание" />&nbsp;</p>
+	<p>oid/url:&nbsp;<input maxlength="100" name="iod" size="20" type="text" />&nbsp;изображение:&nbsp;&nbsp;<input name="page_start" size="5" type="text" />&nbsp;-&nbsp;<input name="page_stop" size="5" type="text" />&nbsp;<input name="AddOid" type="submit" value="Добавить"/>&nbsp;или загрузить&nbsp;<input name="file" type="file" onchange="form.submit()"/><input name="start" type="submit" value="Начать скачивание" />&nbsp;</p>
 </div>
 </form>
 <table  class="table">
 	<thead>
 		<tr>
-			<th>Oid/url</th>
+			<th>oid/url</th>
 			<th>С</th>
 			<th>По</th>
 			<th>Всего</th>

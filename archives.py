@@ -50,6 +50,18 @@ def _save_images(urls,lock,number_trs,sess,dir_new,start,stop,pref_url,sleep_mls
             with lock:    
                 settings.trs[number_trs]['status']=int(settings.trs[number_trs]['status'])+1
     
+def GetFromGenoDbase(katalog,start,stop,number_trs,login,password):
+    lock,katalog,dir_new=_init(katalog) 
+    s = requests.Session()
+    response = s.get(f'{katalog}')
+    bs = BeautifulSoup(response.text,"lxml")
+    btn_download_all=bs.find('button',class_='btn btn-primary btn-lg')
+    urls_for_download=(btn_download_all['data-files'].split())
+    _save_images(urls_for_download,lock,number_trs,s,dir_new,start,stop,'',0,None) 
+    s.close()
+    return number_trs,None
+
+
 
 def GetFromVladimir(katalog,start,stop,number_trs,login,password):        
     lock,katalog,dir_new=_init(katalog) 
