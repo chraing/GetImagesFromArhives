@@ -41,8 +41,9 @@ def _save_images(urls,lock,number_trs,sess,dir_new,start,stop,pref_url,sleep_mls
         settings.trs[number_trs]['status']='0'
         for i in range(int(start)-1,int(stop)):
             data = sess.get(pref_url+urls[i],cookies=cookies)
-            while len(data.text)<50000:
+            while len(data.text)<5:
                 data = sess.get(pref_url+urls[i],cookies=cookies)
+                print(pref_url+urls[i],'повтор получения изображения')
 
             time.sleep(sleep_mls) 
             with open(dir_new.joinpath(str(i+1).zfill(4) +".jpg"), "wb") as out:
@@ -57,7 +58,15 @@ def GetFromGenoDbase(katalog,start,stop,number_trs,login,password):
     bs = BeautifulSoup(response.text,"lxml")
     btn_download_all=bs.find('button',class_='btn btn-primary btn-lg')
     urls_for_download=(btn_download_all['data-files'].split())
-    _save_images(urls_for_download,lock,number_trs,s,dir_new,start,stop,'',0,None) 
+    real_urls=[]
+    for url in urls_for_download:
+        if url[-10:-9]=="_":
+            propusk+=1
+            continue
+        else:
+            real_urls.append(f'{url[:-8]}/{url[-8:]}')
+
+    _save_images(real_urls,lock,number_trs,s,dir_new,start,stop,'',0,None) 
     s.close()
     return number_trs,None
 

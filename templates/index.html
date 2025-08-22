@@ -17,10 +17,11 @@
 	<p>Архив:&nbsp;<select required="required" size="1" name="arhiv" onchange="form.submit()">
 		<option value="yandex.ru"{% if selected_arhiv == "yandex.ru" %} selected {% endif %}>Яндекс Архив</option>
 		<option value="cgamos.ru"{% if selected_arhiv == "cgamos.ru" %} selected {% endif %}>Москва (cgamos.ru)</option>
+		<option value="geno-dbase.ru"{% if selected_arhiv == "geno-dbase.ru" %} selected {% endif %}>geno-dbase.ru</option>
 		<option value="archive.admoblkaluga.ru"{% if selected_arhiv == "archive.admoblkaluga.ru" %} selected {% endif %}>Калуга (ГАКО)</option>
 		<option value="gato.tularegion.ru"{% if selected_arhiv == "gato.tularegion.ru" %} selected {% endif %}>Тула (ГАТО)</option>
 		<option value="vladimir.kaisa.ru"{% if selected_arhiv == "vladimir.kaisa.ru" %} selected {% endif %}>Владимир (ГАТО)</option>
-		<option value="geno-dbase.ru"{% if selected_arhiv == "geno-dbase.ru" %} selected {% endif %}>geno-dbase.ru</option>
+		
 	</select>
 	Логин:&nbsp;<input maxlength="100" name="login" size="15" type="text" {% if log_pas %} value = "{{log_pas[0]}}"{% endif %} />&nbsp; Пароль:&nbsp;<input name="password" size="15" type="password" {% if log_pas %} value = "{{log_pas[1]}}"{% endif %}  />
 &nbsp;<input name="SavePassword" type="submit" value="Сохранить"/></p>
