@@ -1,14 +1,13 @@
 import requests
 from curl_cffi import requests as requests2
 from bs4 import BeautifulSoup
-import httplib2
 import os
 from pathlib import Path
 import sys
 import json
 import time
 import threading
-import  settings
+import settings
 import re
 
 
